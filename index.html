@@ -2623,9 +2623,36 @@
             }
         }
 
-        function sendWhatsAppOrder() {
+        async function savePedidoToSheet(items, lista) {
+            const payload = {
+                token: TOKEN,
+                action: 'save_pedido',
+                cliente: userSession ? (userSession.name || 'Registrado') : 'Anonimo',
+                telefono: userSession ? userSession.phone : '',
+                email: userSession ? userSession.email : '',
+                items: items.map(it => ({ codigo: it.product.codigo, qty: it.qty })),
+                notas: 'Desde carrito web (lista ' + lista + ')'
+            };
+            try {
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) {
+                console.error('No se pudo guardar el pedido en la hoja:', e);
+                // Continuamos con el WhatsApp de todos modos
+            }
+        }
+
+        async function sendWhatsAppOrder() {
             const items = Object.values(cart);
             if (items.length === 0) return;
+
+            const btn = document.getElementById('btnWhatsAppOrder');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Enviando...';
 
             const lista = getCartLista();
             const listaText = lista === 'G' ? 'Lista G (MEJOR PRECIO)'
@@ -2654,14 +2681,147 @@
                 msg += '\n_(Pedido desde catálogo web — aún no registrado)_';
             }
 
+            // Guarda el pedido en la hoja (calcula ganancia server-side, incluye Lista M)
+            await savePedidoToSheet(items, lista);
+
             const url = 'https://wa.me/' + WHATSAPP_PEDIDO_NUMERO + '?text=' + encodeURIComponent(msg);
             window.open(url, '_blank');
+
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+        }
+
+        // ============================================================
+        // RESUMEN CRIS (vista privada con ganancia — ?resumen=1&key=XXX)
+        // ============================================================
+        async function renderResumenView() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const key = urlParams.get('key') || localStorage.getItem('celucenter_cris_key') || '';
+
+            document.body.innerHTML = `
+                <div style="max-width:1400px;margin:0 auto;padding:20px;font-family:'Poppins',sans-serif;">
+                    <h1 style="color:#003087;margin:0 0 6px;">💼 Resumen Cris — Pedidos + Ganancia</h1>
+                    <p style="color:#666;margin:0 0 20px;">Solo visible con la key correcta.</p>
+                    <div id="resumenStatus" style="padding:12px 16px;background:#fff3cd;border-radius:8px;margin-bottom:16px;">Cargando...</div>
+                    <div id="resumenTotales"></div>
+                    <div id="resumenTabla"></div>
+                </div>
+            `;
+
+            if (!key) {
+                const manualKey = prompt('Ingresa la key de Cris para ver el resumen:');
+                if (!manualKey) {
+                    document.getElementById('resumenStatus').textContent = 'Acceso cancelado';
+                    return;
+                }
+                localStorage.setItem('celucenter_cris_key', manualKey);
+                window.location.search = '?resumen=1&key=' + encodeURIComponent(manualKey);
+                return;
+            }
+
+            try {
+                const url = APPS_SCRIPT_URL + '?action=resumen&token=' + encodeURIComponent(TOKEN) + '&key=' + encodeURIComponent(key) + '&limit=200';
+                const resp = await fetch(url);
+                const data = await resp.json();
+
+                if (data.error) {
+                    document.getElementById('resumenStatus').innerHTML = '<strong style="color:#c00;">' + data.error + '</strong>. Borra la key guardada y reintenta: <button onclick="localStorage.removeItem(\'celucenter_cris_key\');location.reload();">Borrar key</button>';
+                    return;
+                }
+
+                localStorage.setItem('celucenter_cris_key', key);
+
+                const t = data.totales || {};
+                const fmt = n => '$' + Number(n || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                document.getElementById('resumenStatus').style.background = '#d4edda';
+                document.getElementById('resumenStatus').innerHTML = '✅ ' + (data.pedidos || []).length + ' pedidos cargados';
+
+                document.getElementById('resumenTotales').innerHTML = `
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px;">
+                        <div style="background:#003087;color:white;padding:16px;border-radius:8px;">
+                            <div style="font-size:0.8rem;opacity:0.8;">Total pedidos</div>
+                            <div style="font-size:1.6rem;font-weight:700;">${t.pedidos || 0}</div>
+                        </div>
+                        <div style="background:#E31837;color:white;padding:16px;border-radius:8px;">
+                            <div style="font-size:0.8rem;opacity:0.8;">Piezas vendidas</div>
+                            <div style="font-size:1.6rem;font-weight:700;">${t.piezas || 0}</div>
+                        </div>
+                        <div style="background:#2E7D32;color:white;padding:16px;border-radius:8px;">
+                            <div style="font-size:0.8rem;opacity:0.8;">Total venta</div>
+                            <div style="font-size:1.6rem;font-weight:700;">${fmt(t.totalVenta)}</div>
+                        </div>
+                        <div style="background:#F57C00;color:white;padding:16px;border-radius:8px;">
+                            <div style="font-size:0.8rem;opacity:0.8;">Total costo (Lista M)</div>
+                            <div style="font-size:1.6rem;font-weight:700;">${fmt(t.totalCosto)}</div>
+                        </div>
+                        <div style="background:linear-gradient(135deg,#2E7D32,#1B5E20);color:white;padding:16px;border-radius:8px;box-shadow:0 4px 12px rgba(46,125,50,0.4);">
+                            <div style="font-size:0.8rem;opacity:0.9;">💰 GANANCIA</div>
+                            <div style="font-size:1.8rem;font-weight:800;">${fmt(t.ganancia)}</div>
+                        </div>
+                        <div style="background:#6A1B9A;color:white;padding:16px;border-radius:8px;">
+                            <div style="font-size:0.8rem;opacity:0.8;">Margen promedio</div>
+                            <div style="font-size:1.6rem;font-weight:700;">${(t.margen || 0).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                `;
+
+                let rows = '';
+                (data.pedidos || []).forEach(p => {
+                    const itemsList = (p.items || []).map(it => `${it.qty}× ${it.codigo}`).join(', ');
+                    rows += `
+                        <tr>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;white-space:nowrap;">${p.timestamp}</td>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;">${p.cliente}<div style="font-size:0.75rem;color:#888;">${p.telefono || ''}</div></td>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;text-align:center;">
+                                <span style="background:${p.lista==='G'?'#1B5E20':p.lista==='F'?'#2E7D32':'#fbc02d'};color:${p.lista==='2X'?'#333':'white'};padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;">${p.lista}</span>
+                            </td>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;text-align:right;">${p.piezas}</td>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;text-align:right;">${fmt(p.totalVenta)}</td>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;text-align:right;color:#c62828;">${fmt(p.totalCosto)}</td>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;text-align:right;color:#2E7D32;font-weight:700;">${fmt(p.ganancia)}</td>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;text-align:right;">${(p.margen || 0).toFixed(1)}%</td>
+                            <td style="padding:10px 8px;border-bottom:1px solid #eee;font-size:0.72rem;color:#666;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${itemsList.replace(/"/g,'&quot;')}">${itemsList}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('resumenTabla').innerHTML = `
+                    <div style="background:white;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.08);overflow-x:auto;">
+                        <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                            <thead>
+                                <tr style="background:#f5f5f5;">
+                                    <th style="padding:12px 8px;text-align:left;">Fecha</th>
+                                    <th style="padding:12px 8px;text-align:left;">Cliente</th>
+                                    <th style="padding:12px 8px;text-align:center;">Lista</th>
+                                    <th style="padding:12px 8px;text-align:right;">Pzs</th>
+                                    <th style="padding:12px 8px;text-align:right;">Venta</th>
+                                    <th style="padding:12px 8px;text-align:right;">Costo</th>
+                                    <th style="padding:12px 8px;text-align:right;">Ganancia</th>
+                                    <th style="padding:12px 8px;text-align:right;">Margen</th>
+                                    <th style="padding:12px 8px;text-align:left;">Items</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows || '<tr><td colspan="9" style="padding:40px;text-align:center;color:#888;">Sin pedidos todavía</td></tr>'}</tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (e) {
+                document.getElementById('resumenStatus').innerHTML = '<strong style="color:#c00;">Error: ' + e.message + '</strong>';
+            }
         }
 
         // ============================================================
         // INIT
         // ============================================================
         async function init() {
+            // Modo resumen Cris: toma control de la página completa
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('resumen') === '1') {
+                await renderResumenView();
+                return;
+            }
+
             // Load saved session
             loadSession();
 
