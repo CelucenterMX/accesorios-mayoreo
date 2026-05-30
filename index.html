@@ -2089,9 +2089,11 @@
         // CARRITO DE COMPRAS
         // ============================================================
         const WHATSAPP_PEDIDO_NUMERO = '5213413300001'; // sin "+", formato wa.me
-        // Sistema escalonado de precios. Cap en G (no se sube a Lista M).
-        const UMBRAL_F = 3000;  // desde $3,000 → Lista F (mayoreo)
-        const UMBRAL_G = 7000;  // desde $7,000 → Lista G (mejor precio, tope)
+        // Sistema escalonado de precios: 2X → F → G → M. Envío incluido desde $6,000.
+        const UMBRAL_F = 2500;  // desde $2,500 → Lista F (mayoreo)
+        const UMBRAL_G = 3500;  // desde $3,500 → Lista G
+        const UMBRAL_M = 5000;  // desde $5,000 → Lista M (mejor precio)
+        const UMBRAL_ENVIO = 6000; // desde $6,000 → envío incluido en pedido
 
         let cart = {}; // { codigo: { product, qty } }
 
@@ -2149,13 +2151,15 @@
             return total;
         }
 
-        // Decide la lista aplicable: escalonado 2X → F → G (cap en G, no sube a M)
+        // Decide la lista aplicable: escalonado 2X → F → G → M
         function getCartLista() {
-            // Empieza en 2X. Si el total a precio 2X >= 3k → sube a F.
+            // Empieza en 2X. Si el total a precio 2X >= 2.5k → sube a F.
             if (getCartTotalAtList('2X') < UMBRAL_F) return '2X';
-            // Ya en F. Si total a precio F >= 7k → sube a G (tope final).
+            // Ya en F. Si total a precio F >= 3.5k → sube a G.
             if (getCartTotalAtList('F') < UMBRAL_G) return 'F';
-            return 'G'; // tope: NO se sube a Lista M
+            // Ya en G. Si total a precio G >= 5k → sube a M (tope final).
+            if (getCartTotalAtList('G') < UMBRAL_M) return 'G';
+            return 'M'; // tope: Lista M (mejor precio)
         }
 
         function getProductPriceForCart(product) {
@@ -2289,11 +2293,17 @@
             }
 
             const lista = getCartLista();
-            if (lista === 'G') {
-                listaBadge.textContent = '🎉 ¡MEJOR PRECIO aplicado! (Lista G)';
+            const total = getCartTotal();
+            if (lista === 'M') {
+                let msg = '🏆 ¡LISTA M aplicada! (MEJOR PRECIO)';
+                if (total >= UMBRAL_ENVIO) msg += ' ✈️ ENVÍO INCLUIDO';
+                listaBadge.textContent = msg;
+                listaBadge.className = 'cart-lista-badge is-elite';
+            } else if (lista === 'G') {
+                listaBadge.textContent = '🎉 ¡LISTA G aplicada! (Mejor precio)';
                 listaBadge.className = 'cart-lista-badge is-top';
             } else if (lista === 'F') {
-                listaBadge.textContent = '✓ Precios MAYOREO (Lista F) aplicados';
+                listaBadge.textContent = '✓ Precios MAYOREO (Lista F)';
                 listaBadge.className = 'cart-lista-badge is-mayoreo';
             } else {
                 listaBadge.textContent = 'Precios MENUDEO (Lista 2X)';
@@ -2334,9 +2344,25 @@
             document.getElementById('cartSummaryTotal').textContent = formatMXN(getCartTotal());
             document.getElementById('btnWhatsAppOrder').disabled = false;
 
-            // Hint escalonado: 2X → F → G (en G no hay hint, ya está en el tope)
-            if (lista === 'G') {
-                hint.style.display = 'none';
+            // Hint escalonado: 2X → F → G → M. Envío incluido desde $6k.
+            if (lista === 'M') {
+                // En M: si total < $6k falta para envío, si >= $6k envío incluido
+                const total = getCartTotal();
+                hint.style.display = 'block';
+                if (total < UMBRAL_ENVIO) {
+                    const faltante = UMBRAL_ENVIO - total;
+                    hint.innerHTML = '✈️ Agrega <strong>' + formatMXN(faltante) + '</strong> más y el <strong>ENVÍO ESTÁ INCLUIDO</strong>';
+                    hint.className = 'cart-mayoreo-hint is-level-m';
+                } else {
+                    hint.innerHTML = '✅ ¡ENVÍO INCLUIDO en este pedido!';
+                    hint.className = 'cart-mayoreo-hint is-level-m-free-shipping';
+                }
+            } else if (lista === 'G') {
+                // Faltante para subir a Lista M
+                const faltante = UMBRAL_M - getCartTotalAtList('G');
+                hint.style.display = 'block';
+                hint.innerHTML = '🚀 Agrega <strong>' + formatMXN(faltante) + '</strong> más y desbloqueas <strong>MEJOR PRECIO (Lista M)</strong>';
+                hint.className = 'cart-mayoreo-hint is-level-g';
             } else if (lista === 'F') {
                 // Faltante para subir a Lista G
                 const faltante = UMBRAL_G - getCartTotalAtList('F');
