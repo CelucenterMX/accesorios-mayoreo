@@ -2358,16 +2358,24 @@
                     hint.className = 'cart-mayoreo-hint is-level-m-free-shipping';
                 }
             } else if (lista === 'G') {
-                // Faltante para subir a Lista M
+                const total = getCartTotal();
                 const faltante = UMBRAL_M - getCartTotalAtList('G');
                 hint.style.display = 'block';
-                hint.innerHTML = '🚀 Agrega <strong>' + formatMXN(faltante) + '</strong> más y desbloqueas <strong>MEJOR PRECIO (Lista M)</strong>';
+                if (total >= UMBRAL_ENVIO) {
+                    hint.innerHTML = '✈️ ¡ENVÍO INCLUIDO en este pedido! · Agrega <strong>' + formatMXN(faltante) + '</strong> más para <strong>LISTA M</strong>';
+                } else {
+                    hint.innerHTML = '🚀 Agrega <strong>' + formatMXN(faltante) + '</strong> más y desbloqueas <strong>MEJOR PRECIO (Lista M)</strong>';
+                }
                 hint.className = 'cart-mayoreo-hint is-level-g';
             } else if (lista === 'F') {
-                // Faltante para subir a Lista G
+                const total = getCartTotal();
                 const faltante = UMBRAL_G - getCartTotalAtList('F');
                 hint.style.display = 'block';
-                hint.innerHTML = '🚀 Agrega <strong>' + formatMXN(faltante) + '</strong> más y desbloqueas <strong>MEJOR PRECIO (Lista G)</strong>';
+                if (total >= UMBRAL_ENVIO) {
+                    hint.innerHTML = '✈️ ¡ENVÍO INCLUIDO en este pedido! · Agrega <strong>' + formatMXN(faltante) + '</strong> más para <strong>LISTA G</strong>';
+                } else {
+                    hint.innerHTML = '🚀 Agrega <strong>' + formatMXN(faltante) + '</strong> más y desbloqueas <strong>MEJOR PRECIO (Lista G)</strong>';
+                }
                 hint.className = 'cart-mayoreo-hint is-level-f';
             } else {
                 // Faltante para subir a Lista F
