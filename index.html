@@ -623,15 +623,14 @@
         }
 
         .grid-5 .cart-add-btn {
-            width: 34px;
-            height: 34px;
-            font-size: 1.3rem;
+            padding: 4px 7px;
+            font-size: 0.65rem;
             bottom: 6px;
             right: 6px;
         }
 
         .grid-5 .cart-add-btn.in-cart {
-            font-size: 0.9rem;
+            font-size: 0.65rem;
         }
 
         .grid-5 .product-pricing {
@@ -710,6 +709,8 @@
             font-weight: 600;
             margin-bottom: 10px;
             width: fit-content;
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
 
         .product-name {
@@ -1075,24 +1076,24 @@
             position: absolute;
             bottom: 10px;
             right: 10px;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
+            padding: 6px 10px;
+            border-radius: 14px;
             background: linear-gradient(135deg, var(--celucenter-red) 0%, var(--celucenter-blue) 100%);
             color: white;
             border: none;
-            font-size: 1.6rem;
+            font-size: 0.75rem;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 3px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             z-index: 5;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             font-family: 'Poppins', sans-serif;
             line-height: 1;
-            padding: 0;
+            white-space: nowrap;
         }
 
         .cart-add-btn:hover {
@@ -1102,7 +1103,7 @@
 
         .cart-add-btn.in-cart {
             background: linear-gradient(135deg, var(--nuevo-green) 0%, var(--nuevo-green-light) 100%);
-            font-size: 1.1rem;
+            font-size: 0.75rem;
         }
 
         .cart-add-btn .qty-badge {
@@ -1125,13 +1126,12 @@
 
         @media (max-width: 480px) {
             .cart-add-btn {
-                width: 36px;
-                height: 36px;
-                font-size: 1.4rem;
+                padding: 5px 8px;
+                font-size: 0.7rem;
                 bottom: 6px;
                 right: 6px;
             }
-            .cart-add-btn.in-cart { font-size: 0.95rem; }
+            .cart-add-btn.in-cart { font-size: 0.7rem; }
             .cart-add-btn .qty-badge {
                 min-width: 18px;
                 height: 18px;
@@ -1747,7 +1747,7 @@
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyYBsBY9CrThLivoVX6BF3uFhQmgDS7308b6KplT-XeN_EzLcjn-Z2Y-VV3YawdTK8zLQ/exec';
         const TOKEN = 'CELUCENTER_SECURE_2025';
         const PHOTO_BASE_URL = 'https://raw.githubusercontent.com/piztian/Accesorios-Celucenter/main/fotos/';
-        const DETAIL_PAGE_URL = 'https://celucentershop.bitrix24.site/detalleaccesorios/';
+        const DETAIL_PAGE_URL = 'https://celucentermx.github.io/accesorios-mayoreo/detalle.html';
 
         // ============================================================
         // STATE
@@ -2307,11 +2307,11 @@
                         </div>
                         <span class="product-almacen-badge" style="background:${color.bg}">${escapeHtml(product.almacen)}</span>
                         ${product.nuevo ? '<span class="badge-nuevo">NUEVO</span>' : ''}
-                        <button class="cart-add-btn" data-codigo="${escapeHtml(product.codigo)}" aria-label="Agregar al carrito" title="Agregar al carrito">+</button>
+                        <button class="cart-add-btn" data-codigo="${escapeHtml(product.codigo)}" aria-label="Agregar al carrito" title="Agregar al carrito">+ Agregar</button>
                     </div>
                     <div class="product-info">
                         <span class="product-category-badge">${escapeHtml(product.categoria)}</span>
-                        <span class="product-code">${escapeHtml(product.codigo)}</span>
+                        <span class="product-code" title="Click para copiar" onclick="event.preventDefault();event.stopPropagation();copyCode('${escapeHtml(product.codigo)}',this)">${escapeHtml(product.codigo)}</span>
                         <h3 class="product-name">${escapeHtml(product.nombre)}</h3>
                         <div class="product-category">
                             <strong>Categoria:</strong> ${escapeHtml(product.categoria)}
@@ -2326,6 +2326,18 @@
         // ============================================================
         // HELPERS
         // ============================================================
+        function copyCode(code, el) {
+            navigator.clipboard.writeText(code).then(() => {
+                const orig = el.textContent;
+                el.textContent = '¡Copiado!';
+                el.style.background = 'linear-gradient(135deg,#2E7D32,#43A047)';
+                setTimeout(() => {
+                    el.textContent = orig;
+                    el.style.background = '';
+                }, 1200);
+            });
+        }
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
@@ -2496,11 +2508,11 @@
             const item = cart[codigo];
             if (item) {
                 btn.classList.add('in-cart');
-                btn.innerHTML = '✓<span class="qty-badge">' + item.qty + '</span>';
+                btn.textContent = '✓ ' + item.qty;
                 btn.setAttribute('title', 'En el carrito (x' + item.qty + ')');
             } else {
                 btn.classList.remove('in-cart');
-                btn.innerHTML = '+';
+                btn.textContent = '+ Agregar';
                 btn.setAttribute('title', 'Agregar al carrito');
             }
         }
