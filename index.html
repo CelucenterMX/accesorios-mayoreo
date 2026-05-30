@@ -551,6 +551,50 @@
         .product-code:hover { background: #fce4ec; }
         .product-code svg { width: 10px; height: 10px; flex-shrink: 0; }
 
+        .product-code-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .product-code-row .product-code { margin-bottom: 0; }
+
+        .stock-badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+        .stock-badge.in-stock {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        .stock-badge.out-of-stock {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .cart-add-btn.agotado {
+            background: #BDBDBD;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .cart-add-btn.agotado:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .almacen-btn-agotado {
+            border-color: #EF9A9A !important;
+            color: #C62828 !important;
+        }
+        .almacen-btn-agotado.active {
+            background: #C62828 !important;
+            border-color: #C62828 !important;
+            color: #fff !important;
+        }
+
         .product-name {
             font-size: 14px;
             font-weight: 600;
@@ -1663,6 +1707,7 @@
                 const archivo = (product.archivo || '').trim();
                 const almacen = (product.almacen || 'LAFT').trim();
                 const nuevo = product.nuevo === true;
+                const existencias = typeof product.existencias === 'number' ? product.existencias : parseInt(product.existencias) || 0;
 
                 if (codigo && nombre) {
                     // Quitar letra de color antes de .png (GAR142N.png → GAR142.png)
@@ -1672,7 +1717,7 @@
                     processedProducts.push({
                         codigo, nombre, categoria,
                         listaM, listaG, listaF, lista2x, precioPublico,
-                        archivo, imagenUrl, almacen, nuevo
+                        archivo, imagenUrl, almacen, nuevo, existencias
                     });
 
                     if (categoria && categoria !== 'Sin categoria') {
@@ -1715,6 +1760,19 @@
                 });
                 container.appendChild(btn);
             });
+
+            // Add "Agotado" filter button
+            var agotadoCount = allProducts.filter(p => p.existencias <= 0).length;
+            if (agotadoCount > 0) {
+                var btnAgotado = document.createElement('button');
+                btnAgotado.className = 'almacen-btn almacen-btn-agotado';
+                btnAgotado.setAttribute('data-almacen', 'AGOTADO');
+                btnAgotado.textContent = 'Agotado (' + agotadoCount + ')';
+                btnAgotado.addEventListener('click', function() {
+                    setAlmacenFilter(this, 'AGOTADO');
+                });
+                container.appendChild(btnAgotado);
+            }
 
             // Re-bind "Todos" button
             container.querySelector('[data-almacen=""]').addEventListener('click', function() {
@@ -1773,7 +1831,7 @@
                     product.categoria.toLowerCase() === categoryFilter;
 
                 const matchesAlmacen = !currentAlmacenFilter ||
-                    product.almacen === currentAlmacenFilter;
+                    (currentAlmacenFilter === 'AGOTADO' ? product.existencias <= 0 : product.almacen === currentAlmacenFilter);
 
                 const matchesNuevo = !filterNuevos || product.nuevo;
 
@@ -1960,16 +2018,19 @@
                     </div>
                     <div class="product-info">
                         <span class="product-category-badge">${escapeHtml(product.categoria)}</span>
-                        <span class="product-code" title="Click para copiar" onclick="event.preventDefault();event.stopPropagation();copyCode('${escapeHtml(product.codigo)}',this)">
-                            ${escapeHtml(product.codigo)}
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        </span>
+                        <div class="product-code-row">
+                            <span class="product-code" title="Click para copiar" onclick="event.preventDefault();event.stopPropagation();copyCode('${escapeHtml(product.codigo)}',this)">
+                                ${escapeHtml(product.codigo)}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            </span>
+                            <span class="stock-badge ${product.existencias > 0 ? 'in-stock' : 'out-of-stock'}">${product.existencias > 0 ? product.existencias + ' pzs' : 'AGOTADO'}</span>
+                        </div>
                         <h3 class="product-name">${escapeHtml(product.nombre)}</h3>
                         ${pricingHtml}
                         <div class="card-actions">
-                            <button class="cart-add-btn" data-codigo="${escapeHtml(product.codigo)}" aria-label="Agregar al carrito" title="Agregar al carrito">
+                            <button class="cart-add-btn${product.existencias <= 0 ? ' agotado' : ''}" data-codigo="${escapeHtml(product.codigo)}" aria-label="Agregar al carrito" title="${product.existencias <= 0 ? 'Sin existencias' : 'Agregar al carrito'}" ${product.existencias <= 0 ? 'disabled' : ''}>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                                Agregar
+                                ${product.existencias <= 0 ? 'Agotado' : 'Agregar'}
                             </button>
                         </div>
                     </div>
