@@ -2132,14 +2132,17 @@
         // Precio unitario de un producto en una lista específica (con fallback).
         // IMPORTANTE: Lista M nunca se usa en el carrito (es la lista de costo de CC).
         function getUnitPriceForList(product, lista) {
+            if (lista === 'M') {
+                return parsePrice(product.listaM) || parsePrice(product.listaG) || parsePrice(product.listaF) || parsePrice(product.precioPublico) || 0;
+            }
             if (lista === 'G') {
-                return parsePrice(product.listaG) || parsePrice(product.listaF) || parsePrice(product.lista2x) || parsePrice(product.precioPublico) || 0;
+                return parsePrice(product.listaG) || parsePrice(product.listaF) || parsePrice(product.precioPublico) || 0;
             }
             if (lista === 'F') {
-                return parsePrice(product.listaF) || parsePrice(product.lista2x) || parsePrice(product.precioPublico) || 0;
+                return parsePrice(product.listaF) || parsePrice(product.precioPublico) || 0;
             }
             // '2X' default
-            return parsePrice(product.lista2x) || parsePrice(product.listaF) || parsePrice(product.precioPublico) || 0;
+            return parsePrice(product.lista2x) || parsePrice(product.precioPublico) || 0;
         }
 
         // Total del carrito evaluado en una lista específica
