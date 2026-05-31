@@ -479,7 +479,7 @@
         /* Badges in image */
         .badge-nuevo {
             position: absolute;
-            top: 14px;
+            bottom: 14px;
             left: 14px;
             background: var(--nuevo-green);
             color: #fff;
@@ -780,7 +780,7 @@
         .grid-5 .product-code { font-size: 9px; padding: 2px 7px; margin-bottom: 6px; }
         .grid-5 .product-category-badge { font-size: 9px; padding: 2px 7px; }
         .grid-5 .product-almacen-badge { font-size: 8px; padding: 3px 7px; top: 8px; right: 8px; }
-        .grid-5 .badge-nuevo { font-size: 8px; padding: 3px 8px; top: 8px; left: 8px; }
+        .grid-5 .badge-nuevo { font-size: 8px; padding: 3px 8px; bottom: 8px; left: 8px; }
         .grid-5 .price-value { font-size: 14px; }
         .grid-5 .price-label { font-size: 9px; }
         .grid-5 .price-public { font-size: 10px; }
@@ -2024,8 +2024,8 @@
                         <div class="product-image-placeholder" style="display: ${product.imagenUrl ? 'none' : 'flex'}">
                             📦
                         </div>
+                        <span class="product-almacen-badge" style="background:${color.bg}">${product.almacen === 'LAFT' ? 'Bodega Mayoreo' : escapeHtml(product.almacen)}</span>
                         ${product.nuevo ? '<span class="badge-nuevo">NUEVO</span>' : ''}
-                        <span class="product-almacen-badge" style="background:${color.bg}">${escapeHtml(product.almacen)}</span>
                     </div>
                     <div class="product-info">
                         <span class="product-category-badge">${escapeHtml(product.categoria)}</span>
