@@ -2024,7 +2024,7 @@
                         <div class="product-image-placeholder" style="display: ${product.imagenUrl ? 'none' : 'flex'}">
                             📦
                         </div>
-                        <span class="product-almacen-badge" style="background:${color.bg}">${product.almacen === 'LAFT' ? 'Bodega Mayoreo' : escapeHtml(product.almacen)}</span>
+                        <span class="product-almacen-badge" style="background:${color.bg}">${escapeHtml(product.almacen)}</span>
                         ${product.nuevo ? '<span class="badge-nuevo">NUEVO</span>' : ''}
                     </div>
                     <div class="product-info">
