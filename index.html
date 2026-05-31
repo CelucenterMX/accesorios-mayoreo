@@ -747,11 +747,36 @@
         .grid-list .product-name { font-size: 14px; }
         .grid-list .product-category-badge { font-size: 10px; padding: 3px 8px; }
         .grid-list .product-almacen-badge { font-size: 9px; padding: 3px 8px; }
-        .grid-list .product-pricing { padding-top: 6px; margin-top: auto; }
-        .grid-list .price-tag { flex-direction: row; flex-wrap: wrap; gap: 8px; }
-        .grid-list .price-yours { font-size: 13px; }
-        .grid-list .price-label { font-size: 10px; }
-        .grid-list .price-value { font-size: 16px; }
+        .grid-list .product-pricing {
+            padding-top: 6px;
+            margin-top: auto;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: flex;
+            gap: 12px;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc #f5f5f5;
+        }
+        .grid-list .product-pricing::-webkit-scrollbar {
+            height: 4px;
+        }
+        .grid-list .product-pricing::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+        .grid-list .product-pricing::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+        .grid-list .price-tag {
+            flex-direction: column;
+            gap: 2px;
+            flex-shrink: 0;
+            min-width: fit-content;
+        }
+        .grid-list .price-yours { font-size: 12px; }
+        .grid-list .price-label { font-size: 9px; }
+        .grid-list .price-value { font-size: 14px; }
         @media (max-width: 768px) {
             .grid-list .product-card { max-height: 130px; }
             .grid-list .product-image-wrapper { width: 120px; min-width: 120px; }
