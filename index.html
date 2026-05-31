@@ -1765,7 +1765,7 @@
                 var btn = document.createElement('button');
                 btn.className = 'almacen-btn';
                 btn.setAttribute('data-almacen', name);
-                btn.textContent = name;
+                btn.textContent = name === 'BODEGA MAYOREO' ? 'BM' : name;
                 btn.addEventListener('click', function() {
                     setAlmacenFilter(this, name);
                 });
@@ -2024,7 +2024,7 @@
                         <div class="product-image-placeholder" style="display: ${product.imagenUrl ? 'none' : 'flex'}">
                             📦
                         </div>
-                        <span class="product-almacen-badge" style="background:${color.bg}">${escapeHtml(product.almacen)}</span>
+                        <span class="product-almacen-badge" style="background:${color.bg}">${product.almacen === 'BODEGA MAYOREO' ? 'BM' : escapeHtml(product.almacen)}</span>
                         ${product.nuevo ? '<span class="badge-nuevo">NUEVO</span>' : ''}
                     </div>
                     <div class="product-info">
