@@ -1721,8 +1721,8 @@
                 const existencias = typeof product.existencias === 'number' ? product.existencias : parseInt(product.existencias) || 0;
 
                 if (codigo && nombre) {
-                    // Quitar letra de color antes de .png (GAR142N.png → GAR142.png)
-                    const archivoFoto = archivo ? archivo.replace(/[A-Z]\.png$/i, '.png') : '';
+                    // Quitar letra de color antes de .png (GAR142N.png → GAR142.png), solo si va precedida de numero
+                    const archivoFoto = archivo ? archivo.replace(/([0-9])[A-Z](\.png)$/i, '$1$2') : '';
                     const imagenUrl = archivoFoto ? `${PHOTO_BASE_URL}${archivoFoto}` : null;
 
                     processedProducts.push({
