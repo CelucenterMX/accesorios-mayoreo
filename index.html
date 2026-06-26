@@ -668,6 +668,43 @@
         }
         .price-register-prompt:hover { background: #D4EAFA; }
 
+        /* Link Web button */
+        .btn-link-web {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 100%;
+            height: 32px;
+            margin-top: 8px;
+            padding: 0 12px;
+            border-radius: 16px;
+            border: 1.5px solid #2AACE2;
+            background: transparent;
+            color: #2AACE2;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .btn-link-web:hover {
+            background: #EBF5FB;
+            border-color: #1a8ab5;
+            color: #1a8ab5;
+        }
+        .btn-link-web svg {
+            flex-shrink: 0;
+            width: 11px;
+            height: 11px;
+        }
+        .grid-5 .btn-link-web { height: 28px; font-size: 10px; margin-top: 6px; }
+        .grid-3 .btn-link-web { height: 30px; font-size: 11px; }
+
         /* Card Actions (Agregar button) */
         .card-actions {
             margin-top: 12px;
@@ -1719,6 +1756,7 @@
                 const almacen = (product.almacen || 'LAFT').trim();
                 const nuevo = product.nuevo === true;
                 const existencias = typeof product.existencias === 'number' ? product.existencias : parseInt(product.existencias) || 0;
+                const linkWeb = (product.linkWeb || '').trim();
 
                 if (codigo && nombre) {
                     // Quitar letra de color antes de .png (GAR142N.png → GAR142.png), solo si va precedida de numero
@@ -1728,7 +1766,7 @@
                     processedProducts.push({
                         codigo, nombre, categoria,
                         listaM, listaG, listaF, lista2x, precioPublico,
-                        archivo, imagenUrl, almacen, nuevo, existencias
+                        archivo, imagenUrl, almacen, nuevo, existencias, linkWeb
                     });
 
                     if (categoria && categoria !== 'Sin categoria') {
@@ -2044,6 +2082,11 @@
                                 ${product.existencias <= 0 ? 'Agotado' : 'Agregar'}
                             </button>
                         </div>
+                        ${product.linkWeb ? `
+                        <a href="${escapeHtml(product.linkWeb)}" target="_blank" rel="noopener noreferrer" class="btn-link-web" onclick="event.stopPropagation();" title="Ver producto en tienda">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            Ver en tienda
+                        </a>` : ''}
                     </div>
                 </div>
                 </a>
