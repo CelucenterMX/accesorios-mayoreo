@@ -446,8 +446,7 @@
             color: inherit;
             display: flex;
             flex-direction: column;
-            height: auto;
-            min-height: 100%;
+            height: 100%;
             cursor: pointer;
             min-width: 0;
         }
@@ -463,8 +462,6 @@
             align-items: center;
             justify-content: center;
             padding: 30px;
-            flex-shrink: 1;
-            min-height: 0;
         }
 
         .product-image {
@@ -2054,9 +2051,9 @@
 
             var linkWebHtml = '';
             if (product.linkWeb) {
-                linkWebHtml = '<a href="' + escapeHtml(product.linkWeb) + '" target="_blank" rel="noopener noreferrer" class="btn-link-web" onclick="event.stopPropagation();" title="Ver producto en tienda">'
+                linkWebHtml = '<button type="button" class="btn-link-web" onclick="event.preventDefault();event.stopPropagation();window.open(\'' + escapeHtml(product.linkWeb).replace(/'/g, "\\'") + '\',\'_blank\')" title="Ver producto en tienda">'
                     + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
-                    + 'Ver en tienda</a>';
+                    + 'Ver en tienda</button>';
             }
 
             return `
