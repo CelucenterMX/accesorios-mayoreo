@@ -457,6 +457,7 @@
             aspect-ratio: 1 / 1;
             background: #F8F9FA;
             overflow: hidden;
+            border-radius: 20px 20px 0 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -519,7 +520,6 @@
             display: flex;
             flex-direction: column;
             min-width: 0;
-            overflow: hidden;
         }
 
         .product-category-badge {
@@ -674,11 +674,10 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
-            width: 100%;
-            height: 32px;
-            margin-top: 8px;
+            flex-shrink: 0;
+            height: 40px;
             padding: 0 12px;
-            border-radius: 16px;
+            border-radius: 20px;
             border: 1.5px solid #2AACE2;
             background: transparent;
             color: #2AACE2;
@@ -689,8 +688,6 @@
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         .btn-link-web:hover {
             background: #EBF5FB;
@@ -702,8 +699,8 @@
             width: 11px;
             height: 11px;
         }
-        .grid-5 .btn-link-web { height: 28px; font-size: 10px; margin-top: 6px; }
-        .grid-3 .btn-link-web { height: 30px; font-size: 11px; }
+        .grid-5 .btn-link-web { height: 32px; font-size: 10px; padding: 0 8px; }
+        .grid-3 .btn-link-web { height: 36px; font-size: 11px; }
 
         /* Card Actions (Agregar button) */
         .card-actions {
@@ -714,7 +711,8 @@
         }
 
         .cart-add-btn {
-            width: 100%;
+            flex: 1;
+            min-width: 0;
             height: 40px;
             padding: 0 16px;
             border-radius: 20px;
@@ -778,7 +776,7 @@
         }
 
         /* List view */
-        .grid-list .product-card { flex-direction: row; max-height: 210px; }
+        .grid-list .product-card { flex-direction: row; max-height: 260px; }
         .grid-list .product-image-wrapper { width: 160px; min-width: 160px; aspect-ratio: auto; height: 100%; padding: 15px; }
         .grid-list .product-info { padding: 15px; }
         .grid-list .product-name { font-size: 14px; }
@@ -790,7 +788,7 @@
         .grid-list .price-label { font-size: 8px; }
         .grid-list .price-value { font-size: 13px; }
         @media (max-width: 768px) {
-            .grid-list .product-card { max-height: 240px; }
+            .grid-list .product-card { max-height: 290px; }
             .grid-list .product-image-wrapper { width: 120px; min-width: 120px; }
             .grid-list .product-info { padding: 12px; }
             .grid-list .product-name { font-size: 12px; }
@@ -2051,8 +2049,15 @@
 
             const detailLink = `${DETAIL_PAGE_URL}#${encodeURIComponent(product.codigo)}`;
 
+            var linkWebHtml = '';
+            if (product.linkWeb) {
+                linkWebHtml = '<button type="button" class="btn-link-web" onclick="event.preventDefault();event.stopPropagation();window.open(\'' + escapeHtml(product.linkWeb).replace(/'/g, "\\'") + '\',\'_blank\')" title="Ver producto en tienda">'
+                    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
+                    + 'Ver en tienda</button>';
+            }
+
             return `
-                <a href="${detailLink}" class="product-card-link" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;height:100%;">
+                <a href="${detailLink}" class="product-card-link">
                 <div class="product-card">
                     <div class="product-image-wrapper">
                         ${product.imagenUrl ?
@@ -2081,12 +2086,8 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                                 ${product.existencias <= 0 ? 'Agotado' : 'Agregar'}
                             </button>
+                            ${linkWebHtml}
                         </div>
-                        ${product.linkWeb ? `
-                        <a href="${escapeHtml(product.linkWeb)}" target="_blank" rel="noopener noreferrer" class="btn-link-web" onclick="event.stopPropagation();" title="Ver producto en tienda">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                            Ver en tienda
-                        </a>` : ''}
                     </div>
                 </div>
                 </a>
