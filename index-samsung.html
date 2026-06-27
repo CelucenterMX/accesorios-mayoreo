@@ -2360,15 +2360,8 @@
 
             const detailLink = `${DETAIL_PAGE_URL}#${encodeURIComponent(product.codigo)}`;
 
-            var linkWebHtml = '';
-            if (product.linkWeb) {
-                linkWebHtml = '<a href="' + escapeHtml(product.linkWeb) + '" target="_blank" rel="noopener noreferrer" class="btn-link-web" onclick="event.stopPropagation();" title="Ver producto en tienda">'
-                    + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
-                    + 'Ver en tienda</a>';
-            }
-
             return `
-                <a href="${detailLink}" class="product-card-link">
+                <a href="${detailLink}" class="product-card-link" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;height:100%;">
                 <div class="product-card" style="border-left:4px solid ${color.bg}">
                     <div class="product-image-wrapper">
                         ${product.imagenUrl ?
@@ -2390,7 +2383,11 @@
                             <strong>Categoria:</strong> ${escapeHtml(product.categoria)}
                         </div>
                         ${pricingHtml}
-                        ${linkWebHtml}
+                        ${product.linkWeb ? `
+                        <a href="${escapeHtml(product.linkWeb)}" target="_blank" rel="noopener noreferrer" class="btn-link-web" onclick="event.stopPropagation();" title="Ver producto en tienda">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            Ver en tienda
+                        </a>` : ''}
                     </div>
                 </div>
                 </a>
