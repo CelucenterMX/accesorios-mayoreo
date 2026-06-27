@@ -428,7 +428,7 @@
         .product-card {
             background: white;
             border-radius: 20px;
-            overflow: visible;
+            overflow: hidden;
             box-shadow: 0 2px 12px rgba(0,0,0,0.04);
             transition: all 0.3s ease;
             display: flex;
@@ -456,7 +456,6 @@
         .product-image-wrapper {
             position: relative;
             aspect-ratio: 1 / 1;
-            max-height: 280px;
             background: #F8F9FA;
             overflow: hidden;
             border-radius: 20px 20px 0 0;
@@ -464,6 +463,8 @@
             align-items: center;
             justify-content: center;
             padding: 30px;
+            flex-shrink: 1;
+            min-height: 0;
         }
 
         .product-image {
@@ -522,7 +523,6 @@
             display: flex;
             flex-direction: column;
             min-width: 0;
-            overflow: visible;
         }
 
         .product-category-badge {
