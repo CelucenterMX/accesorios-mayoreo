@@ -480,8 +480,8 @@
         /* Badges in image */
         .badge-nuevo {
             position: absolute;
-            bottom: 14px;
-            left: 14px;
+            top: 10px;
+            left: 10px;
             background: var(--nuevo-green);
             color: #fff;
             font-size: 10px;
@@ -501,8 +501,8 @@
 
         .product-almacen-badge {
             position: absolute;
-            bottom: 14px;
-            right: 14px;
+            top: 10px;
+            right: 10px;
             color: white;
             padding: 5px 12px;
             border-radius: 12px;
@@ -742,6 +742,14 @@
 
         .cart-add-btn .qty-badge { display: none; }
 
+        @media (max-width: 480px) {
+            .card-actions { gap: 5px; }
+            .cart-add-btn { font-size: 11px; padding: 0 8px; height: 34px; gap: 4px; }
+            .cart-add-btn svg { width: 13px; height: 13px; }
+            .btn-link-web { font-size: 10px; padding: 0 7px; height: 34px; gap: 3px; }
+            .btn-link-web svg { width: 12px; height: 12px; }
+        }
+
         /* Qty controls next to button */
         .card-qty-control {
             display: none;
@@ -814,8 +822,8 @@
         .grid-5 .product-name { font-size: 11px; line-height: 1.3; }
         .grid-5 .product-code { font-size: 9px; padding: 2px 7px; margin-bottom: 6px; }
         .grid-5 .product-category-badge { font-size: 9px; padding: 2px 7px; }
-        .grid-5 .product-almacen-badge { font-size: 8px; padding: 3px 7px; bottom: 8px; right: 8px; }
-        .grid-5 .badge-nuevo { font-size: 8px; padding: 3px 8px; bottom: 8px; left: 8px; }
+        .grid-5 .product-almacen-badge { font-size: 8px; padding: 3px 7px; top: 6px; right: 6px; }
+        .grid-5 .badge-nuevo { font-size: 8px; padding: 3px 8px; top: 6px; left: 6px; }
         .grid-5 .price-value { font-size: 14px; }
         .grid-5 .price-label { font-size: 9px; }
         .grid-5 .price-public { font-size: 10px; }
