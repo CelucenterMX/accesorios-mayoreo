@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo movido — Celulink</title>
+  <meta name="description" content="El catálogo de accesorios de CeluCenter ahora vive en celulink.mx.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://celulink.mx/catalogos/accesorios/">
+  <!-- Fallback inerte: si JS está deshabilitado, el navegador redirige a la lista general tras 5s. -->
+  <!-- JS toma el control inmediatamente y conserva el #SKU en la URL. -->
+  <meta http-equiv="refresh" content="5; url=https://celulink.mx/catalogos/accesorios/">
+  <script>
+    (function(){
+      try {
+        var h = location.hash || '';
+        var dest = 'https://celulink.mx/catalogos/accesorios/' + (h ? 'detalle.html' + h : '');
+        // Sincroniza el meta refresh con el destino (incluye #SKU si existe)
+        var m = document.querySelector('meta[http-equiv="refresh"]');
+        if (m) m.setAttribute('content', '5; url=' + dest);
+        // Redirige inmediatamente preservando el fragmento
+        window.location.replace(dest);
+      } catch (e) {
+        // Si algo falla, el meta refresh a la lista general actuará en 5s.
+      }
+    })();
+  </script>
+  <style>
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: #f8fafc;
+      color: #1A1A2E;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 40px 32px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(11, 37, 69, 0.08);
+      border: 1px solid #E2E8F0;
+    }
+    h1 { font-size: 1.4rem; margin: 0 0 12px; color: #0B2545; font-weight: 800; }
+    p { color: #4A5568; line-height: 1.6; margin: 0 0 20px; }
+    a.btn {
+      display: inline-block;
+      background: #00A5D4;
+      color: white;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 100px;
+      font-weight: 700;
+      font-family: inherit;
+      transition: background 0.2s;
+    }
+    a.btn:hover { background: #0089B0; }
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #0B2545;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+    small { color: #8A94A6; display: block; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">Celulink</div>
+    <h1>Catálogo en nueva dirección</h1>
+    <p>El catálogo de accesorios de CeluCenter ahora vive en <strong>celulink.mx</strong>.</p>
+    <p><a class="btn" href="https://celulink.mx/catalogos/accesorios/" id="manualLink">Ir al catálogo oficial →</a></p>
+    <small>Serás redirigido automáticamente en unos segundos.</small>
+  </div>
+  <noscript>
+    <p style="text-align:center;margin-top:20px;color:#4A5568">
+      Si la redirección no funciona, sigue este enlace:<br>
+      <a href="https://celulink.mx/catalogos/accesorios/" style="color:#00A5D4;font-weight:700">
+        celulink.mx/catalogos/accesorios/
+      </a>
+    </p>
+  </noscript>
+  <script>
+    // Si el JS inline falló por algún motivo, ajustamos el href del botón manual
+    // para que también conserve el #SKU si existe en la URL actual.
+    (function(){
+      try {
+        var h = location.hash || '';
+        if (h) {
+          var a = document.getElementById('manualLink');
+          if (a) a.href = 'https://celulink.mx/catalogos/accesorios/detalle.html' + h;
+        }
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>
